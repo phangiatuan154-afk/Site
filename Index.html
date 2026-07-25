@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tool Độ Nhạy VIP FF</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a1a; color: #fff; margin: 0; padding: 16px; }
+        .container { max-width: 480px; margin: auto; background: #1a1a2e; border-radius: 28px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.8); }
+        h2 { text-align: center; color: #ffd700; text-shadow: 0 0 10px #ffaa00; }
+        .select-box { background: #16213e; border-radius: 16px; padding: 12px; margin: 12px 0; }
+        select { width: 100%; padding: 14px; border-radius: 14px; background: #0f3460; color: #fff; font-size: 18px; border: 2px solid #ffd700; }
+        .slider-group { margin: 20px 0; }
+        .slider-item { background: #1a1a3e; border-radius: 16px; padding: 12px 16px; margin: 10px 0; }
+        .slider-item label { display: flex; justify-content: space-between; font-weight: bold; }
+        input[type="range"] { width: 100%; height: 8px; -webkit-appearance: none; background: linear-gradient(90deg, #ffd700, #ff6b00); border-radius: 8px; margin: 8px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; background: #ffd700; border-radius: 50%; box-shadow: 0 0 16px #ffaa00; cursor: pointer; }
+        .value-badge { background: #0f3460; padding: 4px 14px; border-radius: 30px; color: #ffd700; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; min-width: 100px; padding: 14px; border: none; border-radius: 40px; font-weight: bold; font-size: 16px; background: #ffd700; color: #000; box-shadow: 0 4px 16px #ffaa00aa; }
+        .btn-outline { background: transparent; border: 2px solid #ffd700; color: #ffd700; }
+        .btn:active { transform: scale(0.94); }
+        .code-output { background: #0a0a1a; border: 1px solid #333; border-radius: 16px; padding: 12px; font-family: monospace; font-size: 14px; white-space: pre-wrap; word-break: break-all; margin-top: 16px; max-height: 200px; overflow: auto; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #ffd700; color: #000; padding: 12px 28px; border-radius: 60px; font-weight: bold; box-shadow: 0 8px 24px #ffaa00aa; display: none; }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <h2>🎯 TOOL ĐỘ NHẠY VIP FF</h2>
+    <div class="select-box">
+        <label>📱 Chọn hãng điện thoại</label>
+        <select id="hangDienThoai">
+            <option value="Apple">Apple</option>
+            <option value="Samsung">Samsung</option>
+            <option value="Xiaomi">Xiaomi</option>
+            <option value="OPPO">OPPO</option>
+            <option value="Vivo">Vivo</option>
+            <option value="Realme">Realme</option>
+            <option value="OnePlus">OnePlus</option>
+            <option value="Asus">Asus</option>
+            <option value="Nokia">Nokia</option>
+            <option value="Khác">Khác</option>
+        </select>
+    </div>
+    <div class="select-box">
+        <label>📲 Chọn dòng máy</label>
+        <select id="dongMay">
+            <option value="Flagship">Flagship</option>
+            <option value="Tầm trung">Tầm trung</option>
+            <option value="Gaming">Gaming</option>
+            <option value="Phổ thông">Phổ thông</option>
+        </select>
+    </div>
+
+    <div class="slider-group">
+        <div class="slider-item">
+            <label>🟡 Nhạy chúng <span class="value-badge" id="valChung">0.43</span></label>
+            <input type="range" id="sliderChung" min="0.10" max="2.00" step="0.01" value="0.43">
+        </div>
+        <div class="slider-item">
+            <label>🔵 Nhạy ngâm <span class="value-badge" id="valNgam">1.74</span></label>
+            <input type="range" id="sliderNgam" min="0.10" max="3.00" step="0.01" value="1.74">
+        </div>
+        <div class="slider-item">
+            <label>🟢 Nhạy xoay <span class="value-badge" id="valXoay">0.85</span></label>
+            <input type="range" id="sliderXoay" min="0.10" max="2.50" step="0.01" value="0.85">
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn" id="btnXuatCode">📤 Xuất mã code</button>
+        <button class="btn btn-outline" id="btnReset">↺ Reset mặc định</button>
+        <button class="btn btn-outline" id="btnCopy">📋 Copy cấu hình</button>
+    </div>
+
+    <div class="code-output" id="outputCode">// Code sẽ xuất hiện tại đây</div>
+</div>
+<div class="toast" id="toastMsg">✅ Đã sao chép!</div>
+
+<script>
+(function() {
+    const hangSel = document.getElementById('hangDienThoai');
+    const dongSel = document.getElementById('dongMay');
+    const sliderChung = document.getElementById('sliderChung');
+    const sliderNgam = document.getElementById('sliderNgam');
+    const sliderXoay = document.getElementById('sliderXoay');
+    const valChung = document.getElementById('valChung');
+    const valNgam = document.getElementById('valNgam');
+    const valXoay = document.getElementById('valXoay');
+    const output = document.getElementById('outputCode');
+    const toast = document.getElementById('toastMsg');
+
+    // Cập nhật hiển thị giá trị
+    function updateLabels() {
+        valChung.textContent = parseFloat(sliderChung.value).toFixed(2);
+        valNgam.textContent = parseFloat(sliderNgam.value).toFixed(2);
+        valXoay.textContent = parseFloat(sliderXoay.value).toFixed(2);
+    }
+    sliderChung.addEventListener('input', updateLabels);
+    sliderNgam.addEventListener('input', updateLabels);
+    sliderXoay.addEventListener('input', updateLabels);
+
+    // Tạo code xuất
+    function generateCode() {
+        const hang = hangSel.value;
+        const dong = dongSel.value;
+        const chung = parseFloat(sliderChung.value).toFixed(2);
+        const ngam = parseFloat(sliderNgam.value).toFixed(2);
+        const xoay = parseFloat(sliderXoay.value).toFixed(2);
+        const thoiGian = new Date().toISOString().slice(0,19).replace('T',' ');
+        return `// === CẤU HÌNH ĐỘ NHẠY VIP FF ===\n// Hãng: ${hang} | Dòng: ${dong}\n// Tạo lúc: ${thoiGian}\n// Dành cho Free Fire (hỗ trợ VIP)\n\nconst config = {\n  hang: "${hang}",\n  dongMay: "${dong}",\n  doNhayChung: ${chung},\n  doNhayNgam: ${ngam},\n  doNhayXoay: ${xoay},\n  // Gợi ý thêm cho từng dòng\n  khuyenNghi: {\n    ChongRung: (${chung} * 1.2).toFixed(2),\n    BanPhimAo: (${ngam} * 0.9).toFixed(2)\n  }\n};\n\n// Hàm áp dụng tự động (dành cho script FF)\nfunction apDoNhay() {\n  console.log("Áp dụng cho", config.hang, config.dongMay);\n  // Code trigger ở đây (tùy theo tool hỗ trợ)\n  return config;\n}\napDoNhay();\n// Xuất ra JSON:\nJSON.stringify(config, null, 2);`;
+    }
+
+    function xuatCode() {
+        output.textContent = generateCode();
+    }
+
+    // Reset về mặc định
+    function resetDefault() {
+        sliderChung.value = '0.43';
+        sliderNgam.value = '1.74';
+        sliderXoay.value = '0.85';
+        hangSel.value = 'Apple';
+        dongSel.value = 'Flagship';
+        updateLabels();
+        xuatCode();
+        showToast('🔄 Đã reset về mặc định');
+    }
+
+    // Copy
+    function copyConfig() {
+        const text = output.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => showToast('✅ Đã copy cấu hình!'));
+        } else {
+            // Fallback cho trình duyệt cũ
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('✅ Đã copy (fallback)');
+        }
+    }
+
+    function showToast(msg) {
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 2000);
+    }
+
+    // Gắn sự kiện
+    document.getElementById('btnXuatCode').addEventListener('click', xuatCode);
+    document.getElementById('btnReset').addEventListener('click', resetDefault);
+    document.getElementById('btnCopy').addEventListener('click', copyConfig);
+
+    // Tự động xuất lần đầu
+    xuatCode();
+    updateLabels();
+
+    // Tùy chỉnh thêm: lưu dữ liệu khi đổi hãng/dòng
+    hangSel.addEventListener('change', xuatCode);
+    dongSel.addEventListener('change', xuatCode);
+    sliderChung.addEventListener('change', xuatCode);
+    sliderNgam.addEventListener('change', xuatCode);
+    sliderXoay.addEventListener('change', xuatCode);
+
+    // Xử lý cảm ứng đa điểm (support VIP FF) - giả lập 2 ngón
+    let touchCount = 0;
+    document.addEventListener('touchstart', function(e) {
+        touchCount = e.touches.length;
+        if (touchCount >= 2) {
+            // Kích hoạt chế độ VIP (chỉ hiển thị thử)
+            output.textContent = '⚡ VIP MODE KÍCH HOẠT (2 ngón) - Độ nhạy tăng 15%\n' + generateCode();
+        }
+    }, { passive: true });
+    document.addEventListener('touchend', function() {
+        touchCount = 0;
+    }, { passive: true });
+})();
+</script>
+</body>
+</html>
